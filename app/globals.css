@@ -14,14 +14,30 @@ html {
 body {
   margin: 0;
   padding: 0;
+  background: #202124;
 }
 
 ::selection {
-  background: rgba(138, 180, 248, 0.3);
+  background: rgba(122, 162, 255, 0.3);
 }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.5s ease-out forwards;
 }
 
 input:-webkit-autofill,
